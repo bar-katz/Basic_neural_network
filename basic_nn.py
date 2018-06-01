@@ -14,8 +14,7 @@ def read():
     c = pickle.loads(data)
     train_x = c[0]
     train_y = c[1]
-    test_x = c[2]
-    return train_x, train_y, test_x
+    return train_x, train_y
 
 
 def leakyrelu(x):
@@ -132,32 +131,6 @@ def update(model, deri, lr):
     return model
 
 
-def write_to_file(test_x, model):
-    # write prediction on test set to a file
-    prev_x = None
-
-    f = open("test.pred", "w")
-    for x in test_x:
-        if prev_x is not None:
-            # normalize the vector
-            prev_x = np.ndarray.astype(prev_x, dtype=float)
-            prev_x /= 255
-            prev_x = np.expand_dims(prev_x, axis=1)
-
-            y_hat = forward(prev_x, model)
-            f.write(str(np.argmax(y_hat)))
-            f.write('\n')
-        prev_x = x
-
-    # normalize the vector
-    prev_x = np.ndarray.astype(prev_x, dtype=float)
-    prev_x /= 255
-    prev_x = np.expand_dims(prev_x, axis=1)
-
-    y_hat = forward(prev_x, model)
-    f.write(str(np.argmax(y_hat)))
-    f.close()
-
 # activation functions
 activation_funcs = {'leakyReLU': {'func': leakyrelu, 'derivative': leakyrelu_tag},
                     'tanh': {'func': tanh, 'derivative': tanh_tag}}
@@ -182,7 +155,7 @@ def main():
     model = {'W1': w1, 'b1': b1, 'W2': w2, 'b2': b2}
 
     # read data
-    train_x, train_y, test_x = read()
+    train_x, train_y = read()
 
     sample_size = train_x.shape[0]
 
@@ -256,8 +229,6 @@ def main():
 
         print '#', epoch, ' acc ', vali_acc, ' loss ', avg_loss[0], ' vali loss ', avg_vali_loss[0], ' time ', \
             (end - start)
-
-    write_to_file(test_x, model)
 
 
 if __name__ == "__main__":
